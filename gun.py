@@ -11,8 +11,6 @@ class Gun:
         self.yb = yb   # gun elevation
         self.dir_cos = self.__get_angle_cos()
         self.barrel_coordinates = self.__get_barrel_coordinates()
-        print(self.dir_cos)
-        print(self.barrel_coordinates)
 
     def __get_angle_cos(self):
         b = self.l * math.cos((90 - self.alpha) * math.pi / 180)   # xy plain
