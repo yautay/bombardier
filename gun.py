@@ -5,12 +5,12 @@ import numpy as np
 
 
 class Gun:
-    def __init__(self, vm, alpha, gamma, l, yb, m = 150, cd = 1, sim = "simple"):
+    def __init__(self, vm, alpha, gamma, l, yb, m=150, cd=1, sim="simple"):
         self.__sim = sim   # simple -> no drag & no wind taken into consideration
         self.__mass = m   # projectile mass
         self.__drag_coff = cd   # projectile drag coefficient
         self.__vm = vm   # muzzle velocity m/s
-        self.__alpha = math.radians(alpha)   # vertical inclination
+        self.__alpha = math.radians(90 - alpha)   # vertical inclination
         self.__gamma = math.radians(gamma)   # horizontal azimuth
         self.__l = l   # barrel length
         self.__yb = yb   # gun elevation
@@ -18,7 +18,7 @@ class Gun:
         self.__barrel_coordinates = self.__get_barrel_coordinates()
 
     def __get_angle_cos(self):
-        b = self.__l * math.cos(90 - self.__alpha)   # xy plain
+        b = self.__l * math.cos(math.radians(90) - self.__alpha)   # xy plain
         lx = b * math.cos(self.__gamma)   # barrel x part
         ly = self.__l * math.cos(self.__alpha)   # barrel y part
         lz = b * math.sin(self.__gamma)   # barrel z part
@@ -29,8 +29,8 @@ class Gun:
         return directional_cos_array
 
     def __get_barrel_coordinates(self):
-        xe = self.__l * math.cos(90 - self.__alpha) * math.cos(self.__gamma)   # barrel's end coordinate
-        ze = self.__l * math.cos(90 - self.__alpha) * math.sin(self.__gamma)   # barrel's end coordinate
+        xe = self.__l * math.cos(math.radians(90) - self.__alpha) * math.cos(self.__gamma)   # barrel's end coordinate
+        ze = self.__l * math.cos(math.radians(90) - self.__alpha) * math.sin(self.__gamma)   # barrel's end coordinate
         barrel_coordinates_array = np.array([xe, ze])
         return barrel_coordinates_array
 
@@ -62,9 +62,9 @@ class Gun:
 
     def __get_vector_simple(self, time):
         si = self.__vm * self.__dir_cos[0] * time + self.__barrel_coordinates[0]
-        sj = (self.__yb + self.__l * math.cos(self.__alpha))\
-            + (self.__vm * self.__dir_cos[1] * time)\
-            - (0.5 * 9.81 * math.pow(time, 2))
+        sj = (self.__yb + self.__l * math.cos(self.__alpha)) +\
+            (self.__vm * self.__dir_cos[1] * time) -\
+            (0.5 * 9.81 * time * time)
         sk = self.__vm * self.__dir_cos[2] * time + self.__barrel_coordinates[1]
         vector = np.array([si, sj, sk])
         return vector
@@ -80,7 +80,6 @@ class Gun:
             status = target.check_hit(shell)
             vectors = np.array([[shell[0]], [shell[1]], [shell[2]]])
             vector = np.append(vector, vectors, 1)
-            print(vector)
             if status == 1:
                 print("Target destroyed!!!!")
                 break
